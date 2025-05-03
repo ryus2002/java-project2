@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">user-service</a> &gt; <a href="index.source.html" class="el_package">com.ecommerce.userservice.controller</a> &gt; <span class="el_source">AuthController.java</span></div><h1>AuthController.java</h1><pre class="source lang-java linenums">package com.ecommerce.userservice.controller;
+
+import com.ecommerce.userservice.dto.JwtResponse;
+import com.ecommerce.userservice.dto.LoginRequest;
+import com.ecommerce.userservice.dto.MessageResponse;
+import com.ecommerce.userservice.dto.SignupRequest;
+import com.ecommerce.userservice.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+/**
+ * 認證控制器
+ * 
+ * 處理用戶認證相關的請求，包括註冊和登入。
+ * 提供 RESTful API 端點，接收客戶端的請求並返回適當的響應。
+ * 
+ * @author YourName
+ * @version 1.0
+ * @since 2023-05-03
+ */
+@CrossOrigin(origins = &quot;*&quot;, maxAge = 3600)  // 允許跨域請求
+@RestController
+@RequestMapping(&quot;/api/auth&quot;)  // 基礎路徑
+@Tag(name = &quot;認證管理&quot;, description = &quot;用戶註冊和登入的 API&quot;)
+<span class="fc" id="L34">public class AuthController {</span>
+    
+    @Autowired
+    private UserService userService;
+    
+    /**
+     * 用戶登入端點
+     * 
+     * @param loginRequest 登入請求數據
+     * @return 包含 JWT 令牌和用戶信息的響應
+     */
+    @Operation(summary = &quot;用戶登入&quot;, description = &quot;驗證用戶憑證並返回 JWT 令牌&quot;)
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = &quot;200&quot;, description = &quot;登入成功&quot;,
+                content = @Content(mediaType = &quot;application/json&quot;,
+                schema = @Schema(implementation = JwtResponse.class))),
+        @ApiResponse(responseCode = &quot;401&quot;, description = &quot;用戶名或密碼錯誤&quot;,
+                content = @Content)
+    })
+    @PostMapping(&quot;/signin&quot;)
+    public ResponseEntity&lt;?&gt; authenticateUser(
+            @Parameter(description = &quot;登入請求數據，包含用戶名和密碼&quot;, required = true)
+            @Valid @RequestBody LoginRequest loginRequest) {
+<span class="fc" id="L57">        JwtResponse jwtResponse = userService.authenticateUser(loginRequest);</span>
+<span class="fc" id="L58">        return ResponseEntity.ok(jwtResponse);</span>
+    }
+    
+    /**
+     * 用戶註冊端點
+     * 
+     * @param signupRequest 註冊請求數據
+     * @return 包含操作結果信息的響應
+     */
+    @Operation(summary = &quot;用戶註冊&quot;, description = &quot;創建新用戶並分配角色&quot;)
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = &quot;200&quot;, description = &quot;註冊成功&quot;,
+                content = @Content(mediaType = &quot;application/json&quot;,
+                schema = @Schema(implementation = MessageResponse.class))),
+        @ApiResponse(responseCode = &quot;400&quot;, description = &quot;用戶名或郵箱已存在&quot;,
+                content = @Content(mediaType = &quot;application/json&quot;,
+                schema = @Schema(implementation = MessageResponse.class)))
+    })
+    @PostMapping(&quot;/signup&quot;)
+    public ResponseEntity&lt;?&gt; registerUser(
+            @Parameter(description = &quot;註冊請求數據，包含用戶名、郵箱、密碼等&quot;, required = true)
+            @Valid @RequestBody SignupRequest signupRequest) {
+<span class="fc" id="L80">        MessageResponse messageResponse = userService.registerUser(signupRequest);</span>
+<span class="fc" id="L81">        return ResponseEntity.ok(messageResponse);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

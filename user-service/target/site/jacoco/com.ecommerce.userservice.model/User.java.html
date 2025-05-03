@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>User.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">user-service</a> &gt; <a href="index.source.html" class="el_package">com.ecommerce.userservice.model</a> &gt; <span class="el_source">User.java</span></div><h1>User.java</h1><pre class="source lang-java linenums">package com.ecommerce.userservice.model;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * 用戶實體類
+ * 
+ * 此類映射到資料庫中的 users 表，用於存儲用戶資訊。
+ * 包含用戶的基本資訊、認證資訊和角色關聯。
+ */
+@Entity
+@Table(name = &quot;users&quot;)  // 指定表名為 users
+<span class="pc bnc" id="L19" title="All 90 branches missed.">@Data                   // Lombok 註解，自動生成 getter、setter、equals、hashCode 和 toString 方法</span>
+<span class="fc" id="L20">@NoArgsConstructor      // Lombok 註解，自動生成無參構造函數</span>
+<span class="nc" id="L21">@AllArgsConstructor     // Lombok 註解，自動生成全參構造函數</span>
+public class User {
+    
+    @Id  // 主鍵標記
+    @GeneratedValue(strategy = GenerationType.IDENTITY)  // 主鍵生成策略為自增
+<span class="nc" id="L26">    private Long id;</span>
+    
+    @Column(nullable = false, unique = true)  // 非空且唯一
+<span class="fc" id="L29">    private String username;</span>
+    
+    @Column(nullable = false, unique = true)  // 非空且唯一
+<span class="nc" id="L32">    private String email;</span>
+    
+    @Column(nullable = false)  // 非空
+<span class="fc" id="L35">    private String password;</span>
+    
+    @Column(name = &quot;first_name&quot;)  // 指定列名
+<span class="fc" id="L38">    private String firstName;</span>
+    
+    @Column(name = &quot;last_name&quot;)   // 指定列名
+<span class="fc" id="L41">    private String lastName;</span>
+    
+<span class="fc" id="L43">    private String phone;</span>
+    
+<span class="pc" id="L45">    private boolean enabled = true;  // 默認啟用</span>
+    
+    @Column(name = &quot;created_at&quot;)  // 指定列名
+<span class="nc" id="L48">    private LocalDateTime createdAt;</span>
+    
+    @Column(name = &quot;updated_at&quot;)  // 指定列名
+<span class="nc" id="L51">    private LocalDateTime updatedAt;</span>
+    
+    /**
+     * 用戶與角色的多對多關聯
+     * 
+     * 一個用戶可以有多個角色，一個角色可以被多個用戶擁有。
+     * 使用中間表 user_roles 存儲關聯關係。
+     */
+<span class="pc" id="L59">    @ManyToMany(fetch = FetchType.EAGER)  // 立即加載角色資訊</span>
+    @JoinTable(
+        name = &quot;user_roles&quot;,              // 中間表名稱
+        joinColumns = @JoinColumn(name = &quot;user_id&quot;),            // 當前實體在中間表的外鍵
+        inverseJoinColumns = @JoinColumn(name = &quot;role_id&quot;)      // 關聯實體在中間表的外鍵
+    )
+<span class="nc" id="L65">    private Set&lt;Role&gt; roles = new HashSet&lt;&gt;();</span>
+    
+    /**
+     * 實體創建前的回調方法
+     * 
+     * 在實體被持久化之前自動設置創建時間和更新時間。
+     */
+    @PrePersist
+    protected void onCreate() {
+<span class="nc" id="L74">        this.createdAt = LocalDateTime.now();</span>
+<span class="nc" id="L75">        this.updatedAt = LocalDateTime.now();</span>
+<span class="nc" id="L76">    }</span>
+    
+    /**
+     * 實體更新前的回調方法
+     * 
+     * 在實體被更新之前自動更新更新時間。
+     */
+    @PreUpdate
+    protected void onUpdate() {
+<span class="nc" id="L85">        this.updatedAt = LocalDateTime.now();</span>
+<span class="nc" id="L86">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

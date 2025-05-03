@@ -1,0 +1,26 @@
+# 整合測試專用配置文件
+spring:
+  datasource:
+    # 使用 TestContainers 提供的 MySQL 容器
+    url: jdbc:tc:mysql:8.0://localhost/test
+    username: test
+    password: test
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+# 禁用 Eureka 客戶端，避免在測試中嘗試連接 Eureka 服務器
+eureka:
+  client:
+    enabled: false
+
+# JWT 測試配置
+jwt:
+  secret: 5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437
+  expiration: 86400000  # 24小時

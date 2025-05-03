@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <!-- 繼承父級專案 -->
+    <parent>
+        <groupId>com.ecommerce</groupId>
+        <artifactId>e-commerce-microservices</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <!-- 模組資訊 -->
+    <artifactId>api-gateway</artifactId>
+    <name>api-gateway</name>
+    <description>API 閘道</description>
+
+    <dependencies>
+        <!-- Spring Cloud Gateway 依賴，用於實現 API 閘道功能 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-gateway</artifactId>
+        </dependency>
+        
+        <!-- Eureka Client 依賴，用於向服務註冊中心註冊自己 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+        
+        <!-- Spring Cloud Config Client 依賴，用於從配置中心獲取配置 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-config</artifactId>
+        </dependency>
+        
+        <!-- Spring Boot Actuator 依賴，用於提供健康檢查和監控端點 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Spring Boot Maven 插件，用於構建可執行的 JAR 檔案 -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

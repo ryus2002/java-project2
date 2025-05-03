@@ -1,0 +1,46 @@
+# 伺服器端口配置
+server:
+  port: 8080  # API 閘道端口，作為所有微服務的統一入口點
+
+# Spring 應用程式配置
+spring:
+  application:
+    name: api-gateway  # 應用程式名稱，用於服務識別
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          # 啟用服務發現功能，可以通過服務名稱路由請求
+          enabled: true
+          # 將服務名稱轉換為小寫，使路由更加友好
+          lower-case-service-id: true
+      # 路由配置，定義如何將請求轉發到各個微服務
+      routes:
+        # 用戶服務路由
+        - id: user-service
+          uri: lb://USER-SERVICE  # lb 表示負載平衡，USER-SERVICE 是服務名稱
+          predicates:
+            - Path=/api/users/**  # 匹配路徑，將 /api/users/** 的請求轉發到用戶服務
+        # 產品服務路由
+        - id: product-service
+          uri: lb://PRODUCT-SERVICE
+          predicates:
+            - Path=/api/products/**
+
+# Eureka 客戶端配置
+eureka:
+  client:
+    service-url:
+      # Eureka Server 地址，用於註冊自己
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    # 優先使用 IP 地址而不是主機名，方便服務間通訊
+    prefer-ip-address: true
+
+# 管理端點配置
+management:
+  endpoints:
+    web:
+      exposure:
+        # 暴露所有管理端點，用於監控和管理
+        include: "*"

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JwtUtils.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">user-service</a> &gt; <a href="index.source.html" class="el_package">com.ecommerce.userservice.security.jwt</a> &gt; <span class="el_source">JwtUtils.java</span></div><h1>JwtUtils.java</h1><pre class="source lang-java linenums">package com.ecommerce.userservice.security.jwt;
+
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
+
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
+import java.util.Date;
+
+/**
+ * JWT 工具類
+ * 
+ * 此類提供 JWT (JSON Web Token) 相關的工具方法，包括生成令牌、解析令牌和驗證令牌。
+ * JWT 用於實現無狀態的身份驗證機制，避免在服務器端存儲會話狀態。
+ */
+@Component  // 標記為 Spring 組件
+<span class="nc" id="L23">public class JwtUtils {</span>
+    
+    // 日誌記錄器
+<span class="fc" id="L26">    private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);</span>
+
+    // 從配置文件中注入 JWT 密鑰
+    @Value(&quot;${jwt.secret}&quot;)
+    private String jwtSecret;
+
+    // 從配置文件中注入 JWT 過期時間
+    @Value(&quot;${jwt.expiration}&quot;)
+    private int jwtExpirationMs;
+
+    /**
+     * 生成 JWT 令牌
+     * 
+     * 根據用戶的身份驗證信息生成 JWT 令牌
+     * 
+     * @param authentication 身份驗證對象，包含用戶信息
+     * @return 生成的 JWT 令牌字符串
+     */
+    public String generateJwtToken(Authentication authentication) {
+<span class="nc" id="L45">        UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();</span>
+
+<span class="nc" id="L47">        return Jwts.builder()</span>
+<span class="nc" id="L48">                .setSubject((userPrincipal.getUsername()))  // 設置令牌主題為用戶名</span>
+<span class="nc" id="L49">                .setIssuedAt(new Date())                   // 設置令牌簽發時間</span>
+<span class="nc" id="L50">                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))  // 設置令牌過期時間</span>
+<span class="nc" id="L51">                .signWith(key(), SignatureAlgorithm.HS256)  // 使用 HS256 算法和密鑰簽名</span>
+<span class="nc" id="L52">                .compact();  // 生成最終的令牌字符串</span>
+    }
+
+    /**
+     * 生成用於簽名的密鑰
+     * 
+     * 將配置的 JWT 密鑰字符串轉換為 HMAC-SHA 密鑰
+     * 
+     * @return 用於簽名的密鑰對象
+     */
+    private Key key() {
+<span class="nc" id="L63">        return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));</span>
+    }
+
+    /**
+     * 從 JWT 令牌中獲取用戶名
+     * 
+     * @param token JWT 令牌字符串
+     * @return 令牌中包含的用戶名
+     */
+    public String getUserNameFromJwtToken(String token) {
+<span class="nc" id="L73">        return Jwts.parserBuilder().setSigningKey(key()).build()</span>
+<span class="nc" id="L74">                .parseClaimsJws(token).getBody().getSubject();</span>
+    }
+
+    /**
+     * 驗證 JWT 令牌的有效性
+     * 
+     * 檢查令牌是否有效、是否過期等
+     * 
+     * @param authToken JWT 令牌字符串
+     * @return 如果令牌有效則返回 true，否則返回 false
+     */
+    public boolean validateJwtToken(String authToken) {
+        try {
+<span class="nc" id="L87">            Jwts.parserBuilder().setSigningKey(key()).build().parseClaimsJws(authToken);</span>
+<span class="nc" id="L88">            return true;</span>
+<span class="nc" id="L89">        } catch (MalformedJwtException e) {</span>
+            // 令牌格式不正確
+<span class="nc" id="L91">            logger.error(&quot;Invalid JWT token: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L92">        } catch (ExpiredJwtException e) {</span>
+            // 令牌已過期
+<span class="nc" id="L94">            logger.error(&quot;JWT token is expired: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L95">        } catch (UnsupportedJwtException e) {</span>
+            // 不支持的令牌類型
+<span class="nc" id="L97">            logger.error(&quot;JWT token is unsupported: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L98">        } catch (IllegalArgumentException e) {</span>
+            // 令牌為空
+<span class="nc" id="L100">            logger.error(&quot;JWT claims string is empty: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L101">        }</span>
+
+<span class="nc" id="L103">        return false;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

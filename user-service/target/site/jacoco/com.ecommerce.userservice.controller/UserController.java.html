@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">user-service</a> &gt; <a href="index.source.html" class="el_package">com.ecommerce.userservice.controller</a> &gt; <span class="el_source">UserController.java</span></div><h1>UserController.java</h1><pre class="source lang-java linenums">package com.ecommerce.userservice.controller;
+
+import com.ecommerce.userservice.dto.MessageResponse;
+import com.ecommerce.userservice.model.User;
+import com.ecommerce.userservice.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+/**
+ * 用戶控制器
+ * 
+ * 處理用戶相關的 CRUD 操作，如查詢、更新和刪除用戶。
+ * 提供 RESTful API 端點，接收客戶端的請求並返回適當的響應。
+ * 使用 Spring Security 的方法級安全性控制訪問權限。
+ * 
+ * @author YourName
+ * @version 1.0
+ * @since 2023-05-03
+ */
+@CrossOrigin(origins = &quot;*&quot;, maxAge = 3600)  // 允許跨域請求
+@RestController
+@RequestMapping(&quot;/api/users&quot;)  // 基礎路徑
+@Tag(name = &quot;用戶管理&quot;, description = &quot;用戶 CRUD 操作的 API&quot;)
+@SecurityRequirement(name = &quot;JWT&quot;)  // 指定此控制器中的所有操作都需要 JWT 認證
+<span class="fc" id="L37">public class UserController {</span>
+    
+    @Autowired
+    private UserService userService;
+    
+    /**
+     * 獲取所有用戶
+     * 
+     * 只有具有 ADMIN 角色的用戶才能訪問此端點。
+     * 
+     * @return 用戶列表
+     */
+    @Operation(summary = &quot;獲取所有用戶&quot;, description = &quot;返回系統中的所有用戶列表，需要管理員權限&quot;)
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = &quot;200&quot;, description = &quot;成功獲取用戶列表&quot;),
+        @ApiResponse(responseCode = &quot;403&quot;, description = &quot;沒有權限訪問此資源&quot;)
+    })
+    @GetMapping
+    @PreAuthorize(&quot;hasRole('ADMIN')&quot;)
+    public ResponseEntity&lt;List&lt;User&gt;&gt; getAllUsers() {
+<span class="nc" id="L57">        List&lt;User&gt; users = userService.getAllUsers();</span>
+<span class="nc" id="L58">        return ResponseEntity.ok(users);</span>
+    }
+    
+    /**
+     * 根據 ID 獲取用戶
+     * 
+     * 用戶可以訪問自己的信息，管理員可以訪問任何用戶的信息。
+     * 
+     * @param id 用戶 ID
+     * @return 用戶信息
+     */
+    @Operation(summary = &quot;根據 ID 獲取用戶&quot;, description = &quot;返回指定 ID 的用戶信息，普通用戶只能訪問自己的信息&quot;)
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = &quot;200&quot;, description = &quot;成功獲取用戶信息&quot;),
+        @ApiResponse(responseCode = &quot;404&quot;, description = &quot;用戶不存在&quot;),
+        @ApiResponse(responseCode = &quot;403&quot;, description = &quot;沒有權限訪問此資源&quot;)
+    })
+    @GetMapping(&quot;/{id}&quot;)
+    @PreAuthorize(&quot;hasRole('USER') or hasRole('ADMIN')&quot;)
+    public ResponseEntity&lt;?&gt; getUserById(
+            @Parameter(description = &quot;用戶 ID&quot;, required = true)
+            @PathVariable Long id) {
+<span class="nc" id="L80">        return userService.getUserById(id)</span>
+<span class="nc" id="L81">                .map(ResponseEntity::ok)</span>
+<span class="nc" id="L82">                .orElse(ResponseEntity.notFound().build());</span>
+    }
+    
+    /**
+     * 更新用戶信息
+     * 
+     * 用戶可以更新自己的信息，管理員可以更新任何用戶的信息。
+     * 
+     * @param id 用戶 ID
+     * @param userDetails 更新後的用戶數據
+     * @return 更新後的用戶信息
+     */
+    @Operation(summary = &quot;更新用戶信息&quot;, description = &quot;更新指定 ID 的用戶信息，普通用戶只能更新自己的信息&quot;)
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = &quot;200&quot;, description = &quot;成功更新用戶信息&quot;),
+        @ApiResponse(responseCode = &quot;404&quot;, description = &quot;用戶不存在&quot;),
+        @ApiResponse(responseCode = &quot;403&quot;, description = &quot;沒有權限訪問此資源&quot;)
+    })
+    @PutMapping(&quot;/{id}&quot;)
+    @PreAuthorize(&quot;hasRole('USER') or hasRole('ADMIN')&quot;)
+    public ResponseEntity&lt;?&gt; updateUser(
+            @Parameter(description = &quot;用戶 ID&quot;, required = true)
+            @PathVariable Long id, 
+            @Parameter(description = &quot;更新後的用戶數據&quot;, required = true)
+            @RequestBody User userDetails) {
+<span class="nc" id="L107">        User updatedUser = userService.updateUser(id, userDetails);</span>
+<span class="nc" id="L108">        return ResponseEntity.ok(updatedUser);</span>
+    }
+    
+    /**
+     * 刪除用戶
+     * 
+     * 只有具有 ADMIN 角色的用戶才能刪除用戶。
+     * 
+     * @param id 用戶 ID
+     * @return 操作結果信息
+     */
+    @Operation(summary = &quot;刪除用戶&quot;, description = &quot;刪除指定 ID 的用戶，需要管理員權限&quot;)
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = &quot;200&quot;, description = &quot;成功刪除用戶&quot;,
+                content = @Content(mediaType = &quot;application/json&quot;,
+                schema = @Schema(implementation = MessageResponse.class))),
+        @ApiResponse(responseCode = &quot;404&quot;, description = &quot;用戶不存在&quot;),
+        @ApiResponse(responseCode = &quot;403&quot;, description = &quot;沒有權限訪問此資源&quot;)
+    })
+    @DeleteMapping(&quot;/{id}&quot;)
+    @PreAuthorize(&quot;hasRole('ADMIN')&quot;)
+    public ResponseEntity&lt;?&gt; deleteUser(
+            @Parameter(description = &quot;用戶 ID&quot;, required = true)
+            @PathVariable Long id) {
+<span class="nc" id="L132">        MessageResponse response = userService.deleteUser(id);</span>
+<span class="nc" id="L133">        return ResponseEntity.ok(response);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

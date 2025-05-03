@@ -1,0 +1,33 @@
+# 伺服器端口配置
+server:
+  port: 8888  # 配置中心默認端口
+
+# Spring 應用程式配置
+spring:
+  application:
+    name: config-server  # 應用程式名稱，用於服務識別
+  cloud:
+    config:
+      server:
+        git:
+          # Git 存儲庫地址，用於存儲配置文件
+          uri: https://github.com/yourusername/ecommerce-config
+          # Git 分支名稱
+          default-label: main
+          # 搜索路徑，{application} 會被替換為微服務的名稱
+          search-paths: '{application}'
+          # 啟動時克隆存儲庫，避免首次請求延遲
+          clone-on-start: true
+          # 如果您使用私有存儲庫，請添加以下配置
+          # username: your-username
+          # password: your-password
+
+# Eureka 客戶端配置
+eureka:
+  client:
+    service-url:
+      # Eureka Server 地址，用於註冊自己
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    # 優先使用 IP 地址而不是主機名，方便服務間通訊
+    prefer-ip-address: true

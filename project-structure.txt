@@ -1,0 +1,13 @@
+智慧電商微服務平台 - 專案結構
+
+e-commerce-microservices/
+├── api-gateway/               # API 閘道服務
+├── service-registry/          # 服務註冊與發現 (Eureka Server)
+├── config-server/             # 集中配置服務
+├── user-service/              # 用戶服務
+├── product-service/           # 產品服務
+├── order-service/             # 訂單服務 (第二階段)
+├── payment-service/           # 支付服務 (第二階段)
+├── notification-service/      # 通知服務 (第三階段)
+├── analytics-service/         # 分析服務 (第三階段)
+└── docker-compose.yml         # Docker 組合配置

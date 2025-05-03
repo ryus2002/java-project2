@@ -1,0 +1,61 @@
+# 伺服器端口配置
+server:
+  port: 8082  # 產品服務端口
+
+# Spring 應用程式配置
+spring:
+  application:
+    name: product-service  # 應用程式名稱，用於服務識別
+  
+  # MySQL 資料庫配置
+  datasource:
+    url: jdbc:mysql://localhost:3306/ecommerce_product?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root  # 資料庫用戶名
+    password: root  # 資料庫密碼
+    driver-class-name: com.mysql.cj.jdbc.Driver  # MySQL 驅動類
+  
+  # JPA 配置
+  jpa:
+    hibernate:
+      # 自動更新資料庫結構，根據實體類生成或更新表結構
+      ddl-auto: update
+    # 顯示 SQL 語句，方便調試
+    show-sql: true
+    properties:
+      hibernate:
+        # 格式化 SQL 輸出，提高可讀性
+        format_sql: true
+        # 指定 Hibernate 方言，針對 MySQL 8 優化
+        dialect: org.hibernate.dialect.MySQL8Dialect
+  
+  # MongoDB 配置
+  data:
+    mongodb:
+      host: localhost  # MongoDB 主機
+      port: 27017      # MongoDB 端口
+      database: ecommerce_product  # MongoDB 資料庫名稱
+  
+  # 配置中心配置
+  cloud:
+    config:
+      # 禁用配置中心，在本地開發時方便調試
+      # 生產環境應該啟用此功能，從配置中心獲取配置
+      enabled: false
+
+# Eureka 客戶端配置
+eureka:
+  client:
+    service-url:
+      # Eureka Server 地址，用於註冊自己
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    # 優先使用 IP 地址而不是主機名，方便服務間通訊
+    prefer-ip-address: true
+
+# 管理端點配置
+management:
+  endpoints:
+    web:
+      exposure:
+        # 暴露所有管理端點，用於監控和管理
+        include: "*"

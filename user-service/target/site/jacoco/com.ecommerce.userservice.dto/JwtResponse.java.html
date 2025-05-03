@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JwtResponse.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">user-service</a> &gt; <a href="index.source.html" class="el_package">com.ecommerce.userservice.dto</a> &gt; <span class="el_source">JwtResponse.java</span></div><h1>JwtResponse.java</h1><pre class="source lang-java linenums">package com.ecommerce.userservice.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+import java.util.List;
+
+/**
+ * JWT 響應 DTO
+ * 
+ * 此類用於封裝登入成功後返回給客戶端的數據，包括 JWT 令牌和用戶基本信息。
+ * 客戶端應保存 JWT 令牌，並在後續請求中使用它進行身份驗證。
+ */
+<span class="nc bnc" id="L14" title="All 54 branches missed.">@Data  // Lombok 註解，自動生成 getter、setter、equals、hashCode 和 toString 方法</span>
+<span class="nc" id="L15">@AllArgsConstructor  // Lombok 註解，自動生成全參構造函數</span>
+public class JwtResponse {
+    
+    /**
+     * JWT 令牌
+     * 
+     * 用於後續請求的身份驗證
+     */
+<span class="fc" id="L23">    private String token;</span>
+    
+    /**
+     * 令牌類型
+     * 
+     * 固定為 &quot;Bearer&quot;，符合 OAuth 2.0 規範
+     */
+<span class="pc" id="L30">    private String type = &quot;Bearer&quot;;</span>
+    
+    /**
+     * 用戶 ID
+     * 
+     * 用戶的唯一標識符
+     */
+<span class="fc" id="L37">    private Long id;</span>
+    
+    /**
+     * 用戶名
+     * 
+     * 用戶的登入名稱
+     */
+<span class="fc" id="L44">    private String username;</span>
+    
+    /**
+     * 郵箱地址
+     * 
+     * 用戶的郵箱地址
+     */
+<span class="fc" id="L51">    private String email;</span>
+    
+    /**
+     * 角色列表
+     * 
+     * 用戶擁有的角色列表，用於前端顯示和權限控制
+     */
+<span class="fc" id="L58">    private List&lt;String&gt; roles;</span>
+
+    /**
+     * 構造函數
+     * 
+     * @param token JWT 令牌
+     * @param id 用戶 ID
+     * @param username 用戶名
+     * @param email 郵箱地址
+     * @param roles 角色列表
+     */
+<span class="fc" id="L69">    public JwtResponse(String token, Long id, String username, String email, List&lt;String&gt; roles) {</span>
+<span class="fc" id="L70">        this.token = token;</span>
+<span class="fc" id="L71">        this.id = id;</span>
+<span class="fc" id="L72">        this.username = username;</span>
+<span class="fc" id="L73">        this.email = email;</span>
+<span class="fc" id="L74">        this.roles = roles;</span>
+<span class="fc" id="L75">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

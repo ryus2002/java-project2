@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DatabaseInitializer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">user-service</a> &gt; <a href="index.source.html" class="el_package">com.ecommerce.userservice.config</a> &gt; <span class="el_source">DatabaseInitializer.java</span></div><h1>DatabaseInitializer.java</h1><pre class="source lang-java linenums">package com.ecommerce.userservice.config;
+
+import com.ecommerce.userservice.model.Role;
+import com.ecommerce.userservice.model.User;
+import com.ecommerce.userservice.repository.RoleRepository;
+import com.ecommerce.userservice.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * 資料庫初始化器
+ * 
+ * 在應用程式啟動時自動初始化資料庫，創建預設的角色和管理員用戶。
+ * 實現 CommandLineRunner 介面，Spring Boot 會在啟動後自動執行 run 方法。
+ */
+@Component
+<span class="nc" id="L22">public class DatabaseInitializer implements CommandLineRunner {</span>
+
+    @Autowired
+    private RoleRepository roleRepository;
+    
+    @Autowired
+    private UserRepository userRepository;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    /**
+     * 應用程式啟動後執行的初始化方法
+     * 
+     * @param args 命令列參數
+     */
+    @Override
+    public void run(String... args) {
+        // 初始化角色
+<span class="nc" id="L41">        initRoles();</span>
+        
+        // 創建管理員用戶
+<span class="nc" id="L44">        createAdminUser();</span>
+<span class="nc" id="L45">    }</span>
+    
+    /**
+     * 初始化角色
+     * 
+     * 創建系統中的基本角色：USER、MODERATOR 和 ADMIN
+     */
+    private void initRoles() {
+        // 檢查角色是否已存在
+<span class="nc bnc" id="L54" title="All 2 branches missed.">        if (roleRepository.count() == 0) {</span>
+            // 創建用戶角色
+<span class="nc" id="L56">            Role userRole = new Role();</span>
+<span class="nc" id="L57">            userRole.setName(Role.ERole.ROLE_USER);</span>
+<span class="nc" id="L58">            roleRepository.save(userRole);</span>
+            
+            // 創建版主角色
+<span class="nc" id="L61">            Role modRole = new Role();</span>
+<span class="nc" id="L62">            modRole.setName(Role.ERole.ROLE_MODERATOR);</span>
+<span class="nc" id="L63">            roleRepository.save(modRole);</span>
+            
+            // 創建管理員角色
+<span class="nc" id="L66">            Role adminRole = new Role();</span>
+<span class="nc" id="L67">            adminRole.setName(Role.ERole.ROLE_ADMIN);</span>
+<span class="nc" id="L68">            roleRepository.save(adminRole);</span>
+            
+<span class="nc" id="L70">            System.out.println(&quot;Roles initialized successfully!&quot;);</span>
+        }
+<span class="nc" id="L72">    }</span>
+    
+    /**
+     * 創建管理員用戶
+     * 
+     * 如果管理員用戶不存在，則創建一個預設的管理員用戶
+     */
+    private void createAdminUser() {
+        // 檢查管理員用戶是否已存在
+<span class="nc bnc" id="L81" title="All 2 branches missed.">        if (!userRepository.existsByUsername(&quot;admin&quot;)) {</span>
+            // 創建管理員用戶
+<span class="nc" id="L83">            User adminUser = new User();</span>
+<span class="nc" id="L84">            adminUser.setUsername(&quot;admin&quot;);</span>
+<span class="nc" id="L85">            adminUser.setEmail(&quot;admin@example.com&quot;);</span>
+<span class="nc" id="L86">            adminUser.setPassword(passwordEncoder.encode(&quot;admin123&quot;));</span>
+<span class="nc" id="L87">            adminUser.setFirstName(&quot;Admin&quot;);</span>
+<span class="nc" id="L88">            adminUser.setLastName(&quot;User&quot;);</span>
+<span class="nc" id="L89">            adminUser.setEnabled(true);</span>
+            
+            // 設置管理員角色
+<span class="nc" id="L92">            Set&lt;Role&gt; roles = new HashSet&lt;&gt;();</span>
+<span class="nc" id="L93">            Role adminRole = roleRepository.findByName(Role.ERole.ROLE_ADMIN)</span>
+<span class="nc" id="L94">                    .orElseThrow(() -&gt; new RuntimeException(&quot;Error: Admin Role is not found.&quot;));</span>
+<span class="nc" id="L95">            roles.add(adminRole);</span>
+<span class="nc" id="L96">            adminUser.setRoles(roles);</span>
+            
+            // 保存管理員用戶
+<span class="nc" id="L99">            userRepository.save(adminUser);</span>
+            
+<span class="nc" id="L101">            System.out.println(&quot;Admin user created successfully!&quot;);</span>
+        }
+<span class="nc" id="L103">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TestController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">user-service</a> &gt; <a href="index.source.html" class="el_package">com.ecommerce.userservice.controller</a> &gt; <span class="el_source">TestController.java</span></div><h1>TestController.java</h1><pre class="source lang-java linenums">package com.ecommerce.userservice.controller;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * 測試控制器
+ * 
+ * 提供測試端點，用於驗證不同角色的訪問權限。
+ * 這些端點可以用來測試 JWT 認證和授權機制是否正常工作。
+ * 
+ * @author YourName
+ * @version 1.0
+ * @since 2023-05-03
+ */
+@CrossOrigin(origins = &quot;*&quot;, maxAge = 3600)  // 允許跨域請求
+@RestController
+@RequestMapping(&quot;/api/test&quot;)  // 基礎路徑
+@Tag(name = &quot;測試 API&quot;, description = &quot;用於測試不同角色的訪問權限&quot;)
+<span class="fc" id="L28">public class TestController {</span>
+    
+    /**
+     * 公開訪問端點
+     * 
+     * 所有用戶都可以訪問，無需認證。
+     * 
+     * @return 歡迎消息
+     */
+    @Operation(summary = &quot;公開內容&quot;, description = &quot;所有用戶都可以訪問，無需認證&quot;)
+    @ApiResponse(responseCode = &quot;200&quot;, description = &quot;成功返回公開內容&quot;)
+    @GetMapping(&quot;/all&quot;)
+    public String allAccess() {
+<span class="nc" id="L41">        return &quot;Public Content.&quot;;</span>
+    }
+    
+    /**
+     * 用戶角色訪問端點
+     * 
+     * 只有具有 USER 角色的用戶才能訪問。
+     * 
+     * @return 用戶內容消息
+     */
+    @Operation(summary = &quot;用戶內容&quot;, description = &quot;只有具有 USER 角色的用戶才能訪問&quot;)
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = &quot;200&quot;, description = &quot;成功返回用戶內容&quot;),
+        @ApiResponse(responseCode = &quot;401&quot;, description = &quot;未認證&quot;),
+        @ApiResponse(responseCode = &quot;403&quot;, description = &quot;沒有權限訪問此資源&quot;)
+    })
+    @GetMapping(&quot;/user&quot;)
+    @PreAuthorize(&quot;hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')&quot;)
+    @SecurityRequirement(name = &quot;JWT&quot;)
+    public String userAccess() {
+<span class="nc" id="L61">        return &quot;User Content.&quot;;</span>
+    }
+    
+    /**
+     * 版主角色訪問端點
+     * 
+     * 只有具有 MODERATOR 角色的用戶才能訪問。
+     * 
+     * @return 版主內容消息
+     */
+    @Operation(summary = &quot;版主內容&quot;, description = &quot;只有具有 MODERATOR 角色的用戶才能訪問&quot;)
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = &quot;200&quot;, description = &quot;成功返回版主內容&quot;),
+        @ApiResponse(responseCode = &quot;401&quot;, description = &quot;未認證&quot;),
+        @ApiResponse(responseCode = &quot;403&quot;, description = &quot;沒有權限訪問此資源&quot;)
+    })
+    @GetMapping(&quot;/mod&quot;)
+    @PreAuthorize(&quot;hasRole('MODERATOR')&quot;)
+    @SecurityRequirement(name = &quot;JWT&quot;)
+    public String moderatorAccess() {
+<span class="nc" id="L81">        return &quot;Moderator Board.&quot;;</span>
+    }
+    
+    /**
+     * 管理員角色訪問端點
+     * 
+     * 只有具有 ADMIN 角色的用戶才能訪問。
+     * 
+     * @return 管理員內容消息
+     */
+    @Operation(summary = &quot;管理員內容&quot;, description = &quot;只有具有 ADMIN 角色的用戶才能訪問&quot;)
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = &quot;200&quot;, description = &quot;成功返回管理員內容&quot;),
+        @ApiResponse(responseCode = &quot;401&quot;, description = &quot;未認證&quot;),
+        @ApiResponse(responseCode = &quot;403&quot;, description = &quot;沒有權限訪問此資源&quot;)
+    })
+    @GetMapping(&quot;/admin&quot;)
+    @PreAuthorize(&quot;hasRole('ADMIN')&quot;)
+    @SecurityRequirement(name = &quot;JWT&quot;)
+    public String adminAccess() {
+<span class="nc" id="L101">        return &quot;Admin Board.&quot;;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OpenApiConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">user-service</a> &gt; <a href="index.source.html" class="el_package">com.ecommerce.userservice.config</a> &gt; <span class="el_source">OpenApiConfig.java</span></div><h1>OpenApiConfig.java</h1><pre class="source lang-java linenums">package com.ecommerce.userservice.config;
+
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+/**
+ * OpenAPI (Swagger) 配置類
+ * 
+ * 此類配置 Swagger 文檔的基本信息和安全方案。
+ * 使用 SpringDoc OpenAPI 實現，提供 API 的自動文檔化。
+ * 
+ * @author YourName
+ * @version 1.0
+ * @since 2023-05-03
+ */
+@Configuration
+<span class="nc" id="L24">public class OpenApiConfig {</span>
+    
+    /**
+     * 配置 OpenAPI 基本信息
+     * 
+     * @return OpenAPI 配置對象
+     */
+    @Bean
+    public OpenAPI customOpenAPI() {
+        // 定義 API 標題、描述、版本等基本信息
+<span class="nc" id="L34">        return new OpenAPI()</span>
+<span class="nc" id="L35">                .info(new Info()</span>
+<span class="nc" id="L36">                        .title(&quot;用戶服務 API&quot;)</span>
+<span class="nc" id="L37">                        .description(&quot;智慧電商微服務平台的用戶服務 API 文檔&quot;)</span>
+<span class="nc" id="L38">                        .version(&quot;1.0&quot;)</span>
+<span class="nc" id="L39">                        .contact(new Contact()</span>
+<span class="nc" id="L40">                                .name(&quot;開發團隊&quot;)</span>
+<span class="nc" id="L41">                                .email(&quot;team@example.com&quot;)</span>
+<span class="nc" id="L42">                                .url(&quot;https://example.com&quot;))</span>
+<span class="nc" id="L43">                        .license(new License()</span>
+<span class="nc" id="L44">                                .name(&quot;MIT License&quot;)</span>
+<span class="nc" id="L45">                                .url(&quot;https://opensource.org/licenses/MIT&quot;)))</span>
+                // 添加 JWT 安全方案
+<span class="nc" id="L47">                .addSecurityItem(new SecurityRequirement().addList(&quot;JWT&quot;))</span>
+<span class="nc" id="L48">                .components(new Components()</span>
+<span class="nc" id="L49">                        .addSecuritySchemes(&quot;JWT&quot;, new SecurityScheme()</span>
+<span class="nc" id="L50">                                .name(&quot;JWT&quot;)</span>
+<span class="nc" id="L51">                                .type(SecurityScheme.Type.HTTP)</span>
+<span class="nc" id="L52">                                .scheme(&quot;bearer&quot;)</span>
+<span class="nc" id="L53">                                .bearerFormat(&quot;JWT&quot;)</span>
+<span class="nc" id="L54">                                .in(SecurityScheme.In.HEADER)</span>
+<span class="nc" id="L55">                                .description(&quot;請輸入 JWT Token&quot;)));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

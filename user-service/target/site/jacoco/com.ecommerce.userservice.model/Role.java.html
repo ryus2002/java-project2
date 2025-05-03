@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Role.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">user-service</a> &gt; <a href="index.source.html" class="el_package">com.ecommerce.userservice.model</a> &gt; <span class="el_source">Role.java</span></div><h1>Role.java</h1><pre class="source lang-java linenums">package com.ecommerce.userservice.model;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * 角色實體類
+ * 
+ * 此類映射到資料庫中的 roles 表，用於存儲角色資訊。
+ * 角色用於實現基於角色的訪問控制 (RBAC)，定義用戶的權限範圍。
+ */
+@Entity
+@Table(name = &quot;roles&quot;)  // 指定表名為 roles
+<span class="pc bpc" id="L16" title="20 of 22 branches missed.">@Data                   // Lombok 註解，自動生成 getter、setter、equals、hashCode 和 toString 方法</span>
+<span class="fc" id="L17">@NoArgsConstructor      // Lombok 註解，自動生成無參構造函數</span>
+<span class="nc" id="L18">@AllArgsConstructor     // Lombok 註解，自動生成全參構造函數</span>
+public class Role {
+    
+    @Id  // 主鍵標記
+    @GeneratedValue(strategy = GenerationType.IDENTITY)  // 主鍵生成策略為自增
+<span class="fc" id="L23">    private Long id;</span>
+    
+    /**
+     * 角色名稱，使用枚舉類型
+     * 
+     * 使用 EnumType.STRING 將枚舉值以字符串形式存儲在資料庫中，提高可讀性
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20, unique = true, nullable = false)  // 長度為20，唯一且非空
+<span class="fc" id="L32">    private ERole name;</span>
+    
+    /**
+     * 角色枚舉
+     * 
+     * 定義系統中的角色類型，包括普通用戶、管理員和版主
+     */
+<span class="fc" id="L39">    public enum ERole {</span>
+<span class="fc" id="L40">        ROLE_USER,       // 普通用戶角色</span>
+<span class="fc" id="L41">        ROLE_ADMIN,      // 管理員角色</span>
+<span class="fc" id="L42">        ROLE_MODERATOR   // 版主角色</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserDetailsImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">user-service</a> &gt; <a href="index.source.html" class="el_package">com.ecommerce.userservice.security.services</a> &gt; <span class="el_source">UserDetailsImpl.java</span></div><h1>UserDetailsImpl.java</h1><pre class="source lang-java linenums">package com.ecommerce.userservice.security.services;
+
+import com.ecommerce.userservice.model.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+/**
+ * 用戶詳情實現類
+ * 
+ * 此類實現 Spring Security 的 UserDetails 介面，
+ * 用於封裝用戶的認證信息（如用戶名、密碼）和授權信息（如角色和權限）。
+ * Spring Security 使用此類的實例進行身份驗證和授權決策。
+ */
+public class UserDetailsImpl implements UserDetails {
+    private static final long serialVersionUID = 1L;
+
+    private Long id;  // 用戶 ID
+    private String username;  // 用戶名
+    private String email;  // 郵箱
+    
+    @JsonIgnore  // 在 JSON 序列化時忽略此字段，避免密碼洩露
+    private String password;  // 密碼
+
+    // 用戶的權限集合
+    private Collection&lt;? extends GrantedAuthority&gt; authorities;
+
+    /**
+     * 構造函數
+     * 
+     * @param id 用戶 ID
+     * @param username 用戶名
+     * @param email 郵箱
+     * @param password 密碼
+     * @param authorities 權限集合
+     */
+    public UserDetailsImpl(Long id, String username, String email, String password,
+<span class="fc" id="L44">                           Collection&lt;? extends GrantedAuthority&gt; authorities) {</span>
+<span class="fc" id="L45">        this.id = id;</span>
+<span class="fc" id="L46">        this.username = username;</span>
+<span class="fc" id="L47">        this.email = email;</span>
+<span class="fc" id="L48">        this.password = password;</span>
+<span class="fc" id="L49">        this.authorities = authorities;</span>
+<span class="fc" id="L50">    }</span>
+
+    /**
+     * 從 User 實體構建 UserDetailsImpl 對象
+     * 
+     * 此方法將 User 實體中的角色轉換為 Spring Security 的 GrantedAuthority 對象，
+     * 並創建一個新的 UserDetailsImpl 實例。
+     * 
+     * @param user User 實體
+     * @return UserDetailsImpl 對象
+     */
+    public static UserDetailsImpl build(User user) {
+        // 將 User 實體中的角色轉換為 Spring Security 的 GrantedAuthority 對象
+<span class="nc" id="L63">        List&lt;GrantedAuthority&gt; authorities = user.getRoles().stream()</span>
+<span class="nc" id="L64">                .map(role -&gt; new SimpleGrantedAuthority(role.getName().name()))</span>
+<span class="nc" id="L65">                .collect(Collectors.toList());</span>
+
+        // 創建並返回 UserDetailsImpl 實例
+<span class="nc" id="L68">        return new UserDetailsImpl(</span>
+<span class="nc" id="L69">                user.getId(),</span>
+<span class="nc" id="L70">                user.getUsername(),</span>
+<span class="nc" id="L71">                user.getEmail(),</span>
+<span class="nc" id="L72">                user.getPassword(),</span>
+                authorities);
+    }
+
+    /**
+     * 獲取用戶的權限集合
+     * 
+     * @return 權限集合
+     */
+    @Override
+    public Collection&lt;? extends GrantedAuthority&gt; getAuthorities() {
+<span class="fc" id="L83">        return authorities;</span>
+    }
+
+    /**
+     * 獲取用戶 ID
+     * 
+     * @return 用戶 ID
+     */
+    public Long getId() {
+<span class="fc" id="L92">        return id;</span>
+    }
+
+    /**
+     * 獲取用戶郵箱
+     * 
+     * @return 用戶郵箱
+     */
+    public String getEmail() {
+<span class="fc" id="L101">        return email;</span>
+    }
+
+    /**
+     * 獲取用戶密碼
+     * 
+     * @return 用戶密碼
+     */
+    @Override
+    public String getPassword() {
+<span class="nc" id="L111">        return password;</span>
+    }
+
+    /**
+     * 獲取用戶名
+     * 
+     * @return 用戶名
+     */
+    @Override
+    public String getUsername() {
+<span class="fc" id="L121">        return username;</span>
+    }
+
+    /**
+     * 判斷帳戶是否未過期
+     * 
+     * @return 如果帳戶未過期則返回 true，否則返回 false
+     */
+    @Override
+    public boolean isAccountNonExpired() {
+<span class="nc" id="L131">        return true;  // 默認帳戶永不過期</span>
+    }
+
+    /**
+     * 判斷帳戶是否未鎖定
+     * 
+     * @return 如果帳戶未鎖定則返回 true，否則返回 false
+     */
+    @Override
+    public boolean isAccountNonLocked() {
+<span class="nc" id="L141">        return true;  // 默認帳戶永不鎖定</span>
+    }
+
+    /**
+     * 判斷憑證是否未過期
+     * 
+     * @return 如果憑證未過期則返回 true，否則返回 false
+     */
+    @Override
+    public boolean isCredentialsNonExpired() {
+<span class="nc" id="L151">        return true;  // 默認憑證永不過期</span>
+    }
+
+    /**
+     * 判斷帳戶是否已啟用
+     * 
+     * @return 如果帳戶已啟用則返回 true，否則返回 false
+     */
+    @Override
+    public boolean isEnabled() {
+<span class="nc" id="L161">        return true;  // 默認帳戶永遠啟用</span>
+    }
+
+    /**
+     * 判斷兩個對象是否相等
+     * 
+     * @param o 要比較的對象
+     * @return 如果兩個對象相等則返回 true，否則返回 false
+     */
+    @Override
+    public boolean equals(Object o) {
+<span class="nc bnc" id="L172" title="All 2 branches missed.">        if (this == o)</span>
+<span class="nc" id="L173">            return true;</span>
+<span class="nc bnc" id="L174" title="All 4 branches missed.">        if (o == null || getClass() != o.getClass())</span>
+<span class="nc" id="L175">            return false;</span>
+<span class="nc" id="L176">        UserDetailsImpl user = (UserDetailsImpl) o;</span>
+<span class="nc" id="L177">        return Objects.equals(id, user.id);  // 只比較 ID 是否相等</span>
+    }
+
+    /**
+     * 計算對象的哈希碼
+     * 
+     * @return 對象的哈希碼
+     */
+    @Override
+    public int hashCode() {
+<span class="nc" id="L187">        return Objects.hash(id);  // 只使用 ID 計算哈希碼</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

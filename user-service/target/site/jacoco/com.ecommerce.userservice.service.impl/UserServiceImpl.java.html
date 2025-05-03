@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">user-service</a> &gt; <a href="index.source.html" class="el_package">com.ecommerce.userservice.service.impl</a> &gt; <span class="el_source">UserServiceImpl.java</span></div><h1>UserServiceImpl.java</h1><pre class="source lang-java linenums">package com.ecommerce.userservice.service.impl;
+
+import com.ecommerce.userservice.dto.JwtResponse;
+import com.ecommerce.userservice.dto.LoginRequest;
+import com.ecommerce.userservice.dto.MessageResponse;
+import com.ecommerce.userservice.dto.SignupRequest;
+import com.ecommerce.userservice.model.Role;
+import com.ecommerce.userservice.model.User;
+import com.ecommerce.userservice.repository.RoleRepository;
+import com.ecommerce.userservice.repository.UserRepository;
+import com.ecommerce.userservice.security.jwt.JwtUtils;
+import com.ecommerce.userservice.security.services.UserDetailsImpl;
+import com.ecommerce.userservice.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+/**
+ * 用戶服務實現類
+ * 
+ * 實現 UserService 介面，提供用戶相關的業務邏輯操作。
+ * 處理用戶註冊、登入、查詢、更新和刪除等功能。
+ */
+@Service
+<span class="fc" id="L36">public class UserServiceImpl implements UserService {</span>
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JwtUtils jwtUtils;
+
+    /**
+     * 用戶註冊
+     * 
+     * 檢查用戶名和郵箱是否已存在，如果不存在則創建新用戶。
+     * 為用戶分配角色，如果請求中未指定角色，則默認為普通用戶角色。
+     * 
+     * @param signupRequest 註冊請求數據
+     * @return 包含操作結果信息的響應
+     */
+    @Override
+    @Transactional
+    public MessageResponse registerUser(SignupRequest signupRequest) {
+        // 檢查用戶名是否已存在
+<span class="fc bfc" id="L66" title="All 2 branches covered.">        if (userRepository.existsByUsername(signupRequest.getUsername())) {</span>
+<span class="fc" id="L67">            return new MessageResponse(&quot;Error: Username is already taken!&quot;);</span>
+        }
+
+        // 檢查郵箱是否已存在
+<span class="fc bfc" id="L71" title="All 2 branches covered.">        if (userRepository.existsByEmail(signupRequest.getEmail())) {</span>
+<span class="fc" id="L72">            return new MessageResponse(&quot;Error: Email is already in use!&quot;);</span>
+        }
+
+        // 創建新用戶
+<span class="fc" id="L76">        User user = new User();</span>
+<span class="fc" id="L77">        user.setUsername(signupRequest.getUsername());</span>
+<span class="fc" id="L78">        user.setEmail(signupRequest.getEmail());</span>
+<span class="fc" id="L79">        user.setPassword(passwordEncoder.encode(signupRequest.getPassword()));</span>
+<span class="fc" id="L80">        user.setFirstName(signupRequest.getFirstName());</span>
+<span class="fc" id="L81">        user.setLastName(signupRequest.getLastName());</span>
+<span class="fc" id="L82">        user.setPhone(signupRequest.getPhone());</span>
+
+        // 設置用戶角色
+<span class="fc" id="L85">        Set&lt;String&gt; strRoles = signupRequest.getRoles();</span>
+<span class="fc" id="L86">        Set&lt;Role&gt; roles = new HashSet&lt;&gt;();</span>
+
+<span class="pc bpc" id="L88" title="3 of 4 branches missed.">        if (strRoles == null || strRoles.isEmpty()) {</span>
+            // 如果未指定角色，則默認為普通用戶角色
+<span class="fc" id="L90">            Role userRole = roleRepository.findByName(Role.ERole.ROLE_USER)</span>
+<span class="pc" id="L91">                    .orElseThrow(() -&gt; new RuntimeException(&quot;Error: Role is not found.&quot;));</span>
+<span class="fc" id="L92">            roles.add(userRole);</span>
+<span class="fc" id="L93">        } else {</span>
+            // 根據請求中的角色名稱查找對應的角色
+<span class="nc" id="L95">            strRoles.forEach(role -&gt; {</span>
+<span class="nc bnc" id="L96" title="All 3 branches missed.">                switch (role) {</span>
+                    case &quot;admin&quot;:
+<span class="nc" id="L98">                        Role adminRole = roleRepository.findByName(Role.ERole.ROLE_ADMIN)</span>
+<span class="nc" id="L99">                                .orElseThrow(() -&gt; new RuntimeException(&quot;Error: Role is not found.&quot;));</span>
+<span class="nc" id="L100">                        roles.add(adminRole);</span>
+<span class="nc" id="L101">                        break;</span>
+                    case &quot;mod&quot;:
+<span class="nc" id="L103">                        Role modRole = roleRepository.findByName(Role.ERole.ROLE_MODERATOR)</span>
+<span class="nc" id="L104">                                .orElseThrow(() -&gt; new RuntimeException(&quot;Error: Role is not found.&quot;));</span>
+<span class="nc" id="L105">                        roles.add(modRole);</span>
+<span class="nc" id="L106">                        break;</span>
+                    default:
+<span class="nc" id="L108">                        Role userRole = roleRepository.findByName(Role.ERole.ROLE_USER)</span>
+<span class="nc" id="L109">                                .orElseThrow(() -&gt; new RuntimeException(&quot;Error: Role is not found.&quot;));</span>
+<span class="nc" id="L110">                        roles.add(userRole);</span>
+                }
+<span class="nc" id="L112">            });</span>
+        }
+
+<span class="fc" id="L115">        user.setRoles(roles);</span>
+<span class="fc" id="L116">        userRepository.save(user);</span>
+
+<span class="fc" id="L118">        return new MessageResponse(&quot;User registered successfully!&quot;);</span>
+    }
+
+    /**
+     * 用戶登入
+     * 
+     * 驗證用戶提供的憑證，如果有效則生成 JWT 令牌。
+     * 
+     * @param loginRequest 登入請求數據
+     * @return 包含 JWT 令牌和用戶信息的響應
+     */
+    @Override
+    public JwtResponse authenticateUser(LoginRequest loginRequest) {
+        // 驗證用戶憑證
+<span class="fc" id="L132">        Authentication authentication = authenticationManager.authenticate(</span>
+<span class="fc" id="L133">                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));</span>
+
+        // 設置安全上下文
+<span class="fc" id="L136">        SecurityContextHolder.getContext().setAuthentication(authentication);</span>
+        
+        // 生成 JWT 令牌
+<span class="fc" id="L139">        String jwt = jwtUtils.generateJwtToken(authentication);</span>
+        
+        // 獲取用戶詳情
+<span class="fc" id="L142">        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();</span>
+        
+        // 獲取用戶角色列表
+<span class="fc" id="L145">        List&lt;String&gt; roles = userDetails.getAuthorities().stream()</span>
+<span class="fc" id="L146">                .map(item -&gt; item.getAuthority())</span>
+<span class="fc" id="L147">                .collect(Collectors.toList());</span>
+
+        // 返回 JWT 響應
+<span class="fc" id="L150">        return new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), roles);</span>
+    }
+
+    /**
+     * 根據用戶 ID 查詢用戶
+     * 
+     * @param id 用戶 ID
+     * @return 包含用戶的 Optional 對象，如果未找到則為空
+     */
+    @Override
+    public Optional&lt;User&gt; getUserById(Long id) {
+<span class="fc" id="L161">        return userRepository.findById(id);</span>
+    }
+
+    /**
+     * 查詢所有用戶
+     * 
+     * @return 用戶列表
+     */
+    @Override
+    public List&lt;User&gt; getAllUsers() {
+<span class="fc" id="L171">        return userRepository.findAll();</span>
+    }
+
+    /**
+     * 更新用戶信息
+     * 
+     * @param id 用戶 ID
+     * @param userDetails 更新後的用戶數據
+     * @return 更新後的用戶對象
+     */
+    @Override
+    @Transactional
+    public User updateUser(Long id, User userDetails) {
+<span class="fc" id="L184">        User user = userRepository.findById(id)</span>
+<span class="pc" id="L185">                .orElseThrow(() -&gt; new RuntimeException(&quot;User not found with id: &quot; + id));</span>
+
+        // 更新用戶信息
+<span class="fc" id="L188">        user.setFirstName(userDetails.getFirstName());</span>
+<span class="fc" id="L189">        user.setLastName(userDetails.getLastName());</span>
+<span class="fc" id="L190">        user.setPhone(userDetails.getPhone());</span>
+        
+        // 如果提供了新密碼，則更新密碼
+<span class="pc bpc" id="L193" title="3 of 4 branches missed.">        if (userDetails.getPassword() != null &amp;&amp; !userDetails.getPassword().isEmpty()) {</span>
+<span class="nc" id="L194">            user.setPassword(passwordEncoder.encode(userDetails.getPassword()));</span>
+        }
+        
+<span class="fc" id="L197">        return userRepository.save(user);</span>
+    }
+
+    /**
+     * 刪除用戶
+     * 
+     * @param id 用戶 ID
+     * @return 包含操作結果信息的響應
+     */
+    @Override
+    @Transactional
+    public MessageResponse deleteUser(Long id) {
+<span class="fc bfc" id="L209" title="All 2 branches covered.">        if (!userRepository.existsById(id)) {</span>
+<span class="fc" id="L210">            return new MessageResponse(&quot;Error: User not found with id: &quot; + id);</span>
+        }
+        
+<span class="fc" id="L213">        userRepository.deleteById(id);</span>
+<span class="fc" id="L214">        return new MessageResponse(&quot;User deleted successfully!&quot;);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

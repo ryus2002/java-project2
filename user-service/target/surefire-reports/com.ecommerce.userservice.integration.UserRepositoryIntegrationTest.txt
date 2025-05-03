@@ -1,0 +1,21 @@
+-------------------------------------------------------------------------------
+Test set: com.ecommerce.userservice.integration.UserRepositoryIntegrationTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.029 s <<< FAILURE! -- in com.ecommerce.userservice.integration.UserRepositoryIntegrationTest
+com.ecommerce.userservice.integration.UserRepositoryIntegrationTest -- Time elapsed: 0.029 s <<< ERROR!
+java.lang.IllegalStateException: Previous attempts to find a Docker environment failed. Will not retry. Please see logs and check configuration
+	at org.testcontainers.dockerclient.DockerClientProviderStrategy.getFirstValidStrategy(DockerClientProviderStrategy.java:231)
+	at org.testcontainers.DockerClientFactory.getOrInitializeStrategy(DockerClientFactory.java:150)
+	at org.testcontainers.DockerClientFactory.client(DockerClientFactory.java:191)
+	at org.testcontainers.DockerClientFactory$1.getDockerClient(DockerClientFactory.java:104)
+	at com.github.dockerjava.api.DockerClientDelegate.authConfig(DockerClientDelegate.java:109)
+	at org.testcontainers.containers.GenericContainer.start(GenericContainer.java:321)
+	at org.testcontainers.junit.jupiter.TestcontainersExtension$StoreAdapter.start(TestcontainersExtension.java:274)
+	at org.testcontainers.junit.jupiter.TestcontainersExtension$StoreAdapter.access$200(TestcontainersExtension.java:261)
+	at org.testcontainers.junit.jupiter.TestcontainersExtension.lambda$null$3(TestcontainersExtension.java:76)
+	at org.testcontainers.junit.jupiter.TestcontainersExtension.lambda$startContainers$4(TestcontainersExtension.java:76)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at org.testcontainers.junit.jupiter.TestcontainersExtension.startContainers(TestcontainersExtension.java:76)
+	at org.testcontainers.junit.jupiter.TestcontainersExtension.beforeAll(TestcontainersExtension.java:56)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+

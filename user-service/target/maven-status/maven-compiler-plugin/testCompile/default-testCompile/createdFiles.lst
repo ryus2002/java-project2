@@ -1,0 +1,8 @@
+com\ecommerce\userservice\integration\UserRepositoryIntegrationTest.class
+com\ecommerce\userservice\controller\AuthControllerTest.class
+com\ecommerce\userservice\controller\TestControllerTest.class
+com\ecommerce\userservice\integration\SecurityIntegrationTest.class
+com\ecommerce\userservice\integration\UserControllerIntegrationTest.class
+com\ecommerce\userservice\service\UserServiceImplTest.class
+com\ecommerce\userservice\controller\UserControllerTest.class
+com\ecommerce\userservice\integration\UserServiceIntegrationTest.class

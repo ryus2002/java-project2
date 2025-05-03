@@ -1,0 +1,22 @@
+# 伺服器端口配置
+server:
+  port: 8761  # Eureka Server 默認端口
+
+# Spring 應用程式配置
+spring:
+  application:
+    name: service-registry  # 應用程式名稱，用於服務識別
+
+# Eureka 服務配置
+eureka:
+  client:
+    # 禁止自己向自己註冊，因為這是 Eureka Server 本身
+    register-with-eureka: false
+    # 禁止從自己獲取註冊信息，因為這是單節點 Eureka Server
+    fetch-registry: false
+  server:
+    # 等待時間，當 Eureka Server 啟動時，等待多久才接受客戶端註冊請求
+    wait-time-in-ms-when-sync-empty: 0
+    # 禁用自我保護模式，在開發環境中更容易發現問題
+    # 生產環境建議啟用此功能，以提高系統穩定性
+    enable-self-preservation: false
