@@ -7,11 +7,15 @@ spring:
   application:
     name: user-service  # 應用程式名稱，用於服務識別
   datasource:
-    # MySQL 資料庫連接配置
-    url: jdbc:mysql://localhost:3306/ecommerce_user?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    username: root  # 資料庫用戶名
-    password: root  # 資料庫密碼
-    driver-class-name: com.mysql.cj.jdbc.Driver  # MySQL 驅動類
+    # H2 內存數據庫配置
+    url: jdbc:h2:mem:ecommerce_user
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
   jpa:
     hibernate:
       # 自動更新資料庫結構，根據實體類生成或更新表結構
@@ -22,8 +26,8 @@ spring:
       hibernate:
         # 格式化 SQL 輸出，提高可讀性
         format_sql: true
-        # 指定 Hibernate 方言，針對 MySQL 8 優化
-        dialect: org.hibernate.dialect.MySQL8Dialect
+        # 使用 H2 方言
+        dialect: org.hibernate.dialect.H2Dialect
   cloud:
     config:
       # 禁用配置中心，在本地開發時方便調試
@@ -36,6 +40,8 @@ eureka:
     service-url:
       # Eureka Server 地址，用於註冊自己
       defaultZone: http://localhost:8761/eureka/
+    # 暫時禁用服務註冊，避免依賴 Eureka 服務器
+    enabled: false
   instance:
     # 優先使用 IP 地址而不是主機名，方便服務間通訊
     prefer-ip-address: true

@@ -7,7 +7,7 @@
 - **Java 版本**: 17
 - **Spring Boot**: 3.2.3
 - **Spring Cloud**: 2023.0.0
-- **資料庫**: MySQL, MongoDB, Redis
+- **資料庫**: MySQL, MongoDB, Redis, H2(開發環境)
 - **訊息佇列**: Kafka
 - **容器化**: Docker, Kubernetes
 - **CI/CD**: Jenkins
@@ -122,7 +122,7 @@
 - JDK 17
 - Maven 3.8+
 - Git
-- MySQL 8.0+
+- MySQL 8.0+ (生產環境)
 - Docker (用於運行整合測試)
 
 ### 啟動順序
@@ -150,12 +150,19 @@
    mvn spring-boot:run
    ```
 
+### 開發環境配置
+用戶服務在開發環境使用 H2 內存數據庫，可以通過以下方式訪問 H2 控制台：
+- H2 控制台: http://localhost:8081/h2-console
+- JDBC URL: jdbc:h2:mem:ecommerce_user
+- 用戶名: sa
+- 密碼: (留空)
+
 ### 訪問服務
 - 服務註冊中心: http://localhost:8761
 - API 閘道: http://localhost:8080
 - 用戶服務: http://localhost:8081/api/auth/signup (註冊)
 - 用戶服務: http://localhost:8081/api/auth/signin (登入)
-- 用戶服務 API 文檔: http://localhost:8081/swagger-ui.html
+- 用戶服務 API 文檔: http://localhost:8081/swagger-ui/index.html
 
 ### 運行測試
 ```

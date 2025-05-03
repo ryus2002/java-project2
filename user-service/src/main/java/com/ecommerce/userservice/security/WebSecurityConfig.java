@@ -107,8 +107,14 @@ public class WebSecurityConfig {
             .authorizeHttpRequests(auth -> 
                 auth.requestMatchers("/api/auth/**").permitAll()  // 允許所有人訪問認證相關的 URL
                     .requestMatchers("/api/test/**").permitAll()  // 允許所有人訪問測試相關的 URL
+                    .requestMatchers("/swagger-ui/**").permitAll()  // 允許所有人訪問 Swagger UI
+                    .requestMatchers("/v3/api-docs/**").permitAll()  // 允許所有人訪問 API 文檔
+                    .requestMatchers("/h2-console/**").permitAll()  // 允許所有人訪問 H2 控制台
                     .anyRequest().authenticated()  // 其他所有請求都需要認證
             );
+        
+        // 允許 H2 控制台的 frame 顯示
+        http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
         
         http.authenticationProvider(authenticationProvider());  // 設置認證提供者
         

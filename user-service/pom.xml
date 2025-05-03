@@ -71,6 +71,13 @@
             <scope>runtime</scope>
         </dependency>
         
+        <!-- H2 資料庫，用於開發和測試環境 -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        
         <!-- Eureka Client 依賴，用於向服務註冊中心註冊自己 -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -123,13 +130,6 @@
             <groupId>org.testcontainers</groupId>
             <artifactId>mysql</artifactId>
             <version>1.18.3</version>
-            <scope>test</scope>
-        </dependency>
-        
-        <!-- H2 資料庫，用於單元測試 -->
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
