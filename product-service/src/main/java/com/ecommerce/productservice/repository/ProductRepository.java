@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -65,15 +66,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByStockLessThan(Integer threshold);
     
     /**
-     * 查詢熱門產品
-     * 
-     * 使用自定義 SQL 查詢，根據訂單量排序產品
-     * 此方法需要訂單服務的支持，可能需要通過消息佇列或事件驅動來更新產品的熱門程度
-     * 
+     * 獲取熱門產品
+     *
      * @param limit 返回的產品數量
      * @return 熱門產品列表
      */
-    @Query(value = "SELECT p.* FROM products p WHERE p.is_active = true ORDER BY p.popularity DESC LIMIT ?1", nativeQuery = true)
+    @Query(value = "SELECT p.* FROM products p WHERE p.is_active = true ORDER BY p.popularity DESC", nativeQuery = true)
     List<Product> findTopProducts(int limit);
     
     /**
@@ -94,5 +92,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
            "(:maxPrice IS NULL OR p.price <= :maxPrice) AND " +
            "(:brand IS NULL OR p.brand = :brand) AND " +
            "p.isActive = true")
-    Page<Product> findProductsByFilters(String name, Long categoryId, BigDecimal minPrice, BigDecimal maxPrice, String brand, Pageable pageable);
+    Page<Product> findProductsByFilters(
+            @Param("name") String name, 
+            @Param("categoryId") Long categoryId, 
+            @Param("minPrice") BigDecimal minPrice, 
+            @Param("maxPrice") BigDecimal maxPrice, 
+            @Param("brand") String brand, 
+            Pageable pageable);
 }
